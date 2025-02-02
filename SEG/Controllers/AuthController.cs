@@ -13,28 +13,132 @@ namespace SEG.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
+    // Injeção de dependências necessárias para as operações de autenticação e gerenciamento de usuários/roles.
     private readonly ITokenService _tokenService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ITokenService tokenService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+    // Construtor com injeção de dependências.
+    public AuthController(ITokenService tokenService,
+                          UserManager<ApplicationUser> userManager,
+                          RoleManager<IdentityRole> roleManager,
+                          IConfiguration configuration,
+                          ILogger<AuthController> logger)
     {
         _tokenService = tokenService;
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Cria uma nova role no sistema.
+    /// </summary>
+    /// <param name="roleName">Nome da role a ser criada.</param>
+    /// <returns>Resposta HTTP com o status da operação.</returns>
+    [HttpPost]
+    [Route("CreateRole")]
+    public async Task<IActionResult> CreateRole(string roleName)
+    {
+        // Verifica se a role já existe
+        var roleExist = await _roleManager.RoleExistsAsync(roleName);
+
+        if (!roleExist)
+        {
+            // Se a role não existir, cria uma nova role
+            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+            if (roleResult.Succeeded)
+            {
+                _logger.LogInformation(1, "Roles Added");
+                return StatusCode(StatusCodes.Status200OK, new Response
+                {
+                    Status = "Sucess",
+                    Message = $"Role {roleName} added succesfully"
+                });
+            }
+            else
+            {
+                _logger.LogInformation(2, "Error");
+                return StatusCode(StatusCodes.Status400BadRequest, new Response
+                {
+                    Status = "Error",
+                    Message = $"Issue adding the new {roleName} role"
+                });
+            }
+        }
+
+        // Retorna erro se a role já existir
+        return StatusCode(StatusCodes.Status400BadRequest, new Response
+        {
+            Status = "Error",
+            Message = "Role already exist"
+        });
+    }
+
+    /// <summary>
+    /// Adiciona um usuário a uma role específica.
+    /// </summary>
+    /// <param name="email">Email do usuário.</param>
+    /// <param name="roleName">Nome da role a ser atribuída.</param>
+    /// <returns>Resposta HTTP com o status da operação.</returns>
+    [HttpPost]
+    [Route("AddUserToRole")]
+    public async Task<IActionResult> AddUserToRole(string email, string roleName)
+    {
+        // Busca o usuário pelo email
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user != null)
+        {
+            // Tenta adicionar o usuário à role informada
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation(1, $"User {user.Email} added to the {roleName} role");
+                return StatusCode(StatusCodes.Status200OK, new Response
+                {
+                    Status = "Sucess",
+                    Message = $"User {user.Email} added to the {roleName} role"
+                });
+            }
+            else
+            {
+                _logger.LogInformation(1, $"Error: Unable to add user {user.Email} to the {roleName} role");
+                return StatusCode(StatusCodes.Status400BadRequest, new Response
+                {
+                    Status = "Error",
+                    Message = $"Error: Unable to add user {user.Email} to the {roleName} role"
+                });
+            }
+        }
+
+        // Retorna erro caso o usuário não seja encontrado
+        return BadRequest(new { error = "Unable to find user" });
+    }
+
+    /// <summary>
+    /// Realiza o login do usuário e gera os tokens de acesso e refresh.
+    /// </summary>
+    /// <param name="model">Dados de login contendo o nome de usuário e senha.</param>
+    /// <returns>Objeto com o token de acesso, refresh token e data de expiração.</returns>
     [HttpPost]
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
+        // Busca o usuário pelo nome de usuário
         var user = await _userManager.FindByNameAsync(model.UserName!);
 
+        // Verifica se o usuário existe e se a senha está correta
         if (user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
         {
+            // Recupera as roles associadas ao usuário
             var userRoles = await _userManager.GetRolesAsync(user);
+
+            // Cria as claims que serão inseridas no token
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName!),
@@ -42,22 +146,29 @@ public class AuthController : ControllerBase
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            // Adiciona as roles como claims
             foreach (var userRole in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
 
+            // Gera o token de acesso usando as claims definidas e a configuração
             var token = _tokenService.GenerateAcessToken(authClaims, _configuration);
 
+            // Gera o refresh token
             var refreshToken = _tokenService.GenerateRefreshToken();
 
+            // Recupera o tempo de validade do refresh token a partir da configuração
             _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes);
 
+            // Define o tempo de expiração e armazena o refresh token no usuário
             user.RefreshTokenExpirtyTime = DateTime.Now.AddMinutes(refreshTokenValidityInMinutes);
             user.RefreshToken = refreshToken;
 
+            // Atualiza o usuário com o refresh token e a nova data de expiração
             await _userManager.UpdateAsync(user);
 
+            // Retorna o token de acesso, refresh token e data de expiração
             return Ok(new
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -66,20 +177,32 @@ public class AuthController : ControllerBase
             });
         }
 
+        // Retorna não autorizado se as credenciais estiverem incorretas
         return Unauthorized();
     }
 
+    /// <summary>
+    /// Registra um novo usuário no sistema.
+    /// </summary>
+    /// <param name="model">Dados de registro do usuário (nome, email e senha).</param>
+    /// <returns>Resposta HTTP com o status da operação.</returns>
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
+        // Verifica se já existe um usuário com o mesmo nome
         var userExists = await _userManager.FindByNameAsync(model.UserName!);
 
-        if (userExists != null) 
+        if (userExists != null)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Usuário já existe" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new Response
+            {
+                Status = "Error",
+                Message = "Usuário já existe"
+            });
         }
 
+        // Cria um novo objeto ApplicationUser com os dados de registro
         ApplicationUser user = new()
         {
             Email = model.Email,
@@ -87,69 +210,105 @@ public class AuthController : ControllerBase
             UserName = model.UserName
         };
 
+        // Tenta criar o usuário no sistema com a senha informada
         var result = await _userManager.CreateAsync(user, model.Password!);
 
-        if (!result.Succeeded) 
+        if (!result.Succeeded)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Criação do usuário falhou." });
+            return StatusCode(StatusCodes.Status500InternalServerError, new Response
+            {
+                Status = "Error",
+                Message = "Criação do usuário falhou."
+            });
         }
 
-        return Ok(new Response { Status = "Sucess", Message = "Usuário criado com sucesso" });
+        // Retorna sucesso caso o usuário seja criado
+        return Ok(new Response
+        {
+            Status = "Sucess",
+            Message = "Usuário criado com sucesso"
+        });
     }
 
+    /// <summary>
+    /// Atualiza o token de acesso usando um refresh token.
+    /// </summary>
+    /// <param name="tokenModel">Objeto contendo o token de acesso expirado e o refresh token.</param>
+    /// <returns>Novos tokens caso a operação seja bem-sucedida.</returns>
     [HttpPost]
     [Route("refresh-token")]
     public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
     {
-        if (tokenModel is null) 
-        { 
+        // Verifica se o objeto tokenModel é nulo
+        if (tokenModel is null)
+        {
             return BadRequest("Invalid client request");
         };
 
+        // Garante que os tokens não sejam nulos
         string? acessToken = tokenModel.AcessToken ?? throw new ArgumentNullException(nameof(tokenModel));
         string? refreshToken = tokenModel.RefreshToken ?? throw new ArgumentNullException(nameof(tokenModel));
 
+        // Extrai o ClaimsPrincipal a partir do token de acesso expirado
         var principal = _tokenService.GetPrincipalFromExpiredToken(acessToken!, _configuration);
         if (principal == null)
         {
             return BadRequest("Invalid acess token/refresh token");
         }
 
+        // Obtém o nome do usuário a partir das claims
         string userName = principal.Identity.Name;
 
+        // Busca o usuário no banco de dados
         var user = await _userManager.FindByNameAsync(userName!);
 
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirtyTime <= DateTime.Now) 
+        // Verifica se o usuário existe, se o refresh token confere e se o mesmo ainda é válido
+        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirtyTime <= DateTime.Now)
         {
             return BadRequest("Invalid acess token/refresh token");
         }
 
+        // Gera um novo token de acesso com as claims existentes
         var newAcessToken = _tokenService.GenerateAcessToken(principal.Claims.ToList(), _configuration);
+        // Gera um novo refresh token
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
+        // Atualiza o usuário com o novo refresh token
         user.RefreshToken = newRefreshToken;
         await _userManager.UpdateAsync(user);
 
+        // Retorna os novos tokens
         return new ObjectResult(new
         {
             acessToken = new JwtSecurityTokenHandler().WriteToken(newAcessToken),
             refreshToken = newRefreshToken
         });
-
     }
 
+    /// <summary>
+    /// Revoga o refresh token de um usuário, efetivamente invalidando o token de atualização.
+    /// Requer autorização para acessar este endpoint.
+    /// </summary>
+    /// <param name="username">Nome de usuário do qual o refresh token será revogado.</param>
+    /// <returns>Status 204 (No Content) em caso de sucesso ou erro caso o usuário não seja encontrado.</returns>
     [Authorize]
     [HttpPost]
     [Route("revoke/{username}")]
     public async Task<IActionResult> Revoke(string username)
     {
+        // Busca o usuário pelo nome
         var user = await _userManager.FindByNameAsync(username);
 
-        if (user == null) { return BadRequest("Usuário inválido");  }
+        if (user == null)
+        {
+            return BadRequest("Usuário inválido");
+        }
 
+        // Revoga o refresh token atribuindo null
         user.RefreshToken = null;
         await _userManager.UpdateAsync(user);
 
+        // Retorna status 204 (No Content) para indicar que a operação foi concluída sem retorno de conteúdo
         return NoContent();
     }
 }

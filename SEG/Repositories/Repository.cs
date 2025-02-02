@@ -20,6 +20,11 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
+        // Usar o AsNoTracking pra não ficar rastreavel assim melhora o desempenho
+        // Porém é bom usar só quando vai ter certeza que não vai reutilizar as informações que trouxe
+        // Aqui no exemplo esta apenas consultando e mostrando as informações
+        // Não preciso usar ela depois
+
         return await _context.Set<T>().AsNoTracking().ToListAsync();
     }
     public T Create(T entity)
