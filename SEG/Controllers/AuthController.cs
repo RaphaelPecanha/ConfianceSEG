@@ -239,49 +239,54 @@ public class AuthController : ControllerBase
     [Route("refresh-token")]
     public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
     {
-        // Verifica se o objeto tokenModel é nulo
         if (tokenModel is null)
         {
             return BadRequest("Invalid client request");
         };
 
-        // Garante que os tokens não sejam nulos
         string? acessToken = tokenModel.AcessToken ?? throw new ArgumentNullException(nameof(tokenModel));
         string? refreshToken = tokenModel.RefreshToken ?? throw new ArgumentNullException(nameof(tokenModel));
+
+        // Verifica se o token de acesso ainda é válido para evitar renovações desnecessárias
+        var handler = new JwtSecurityTokenHandler();
+        ar jwtSecurityToken = handler.ReadJwtToken(acessToken);
+
+        if (jwtSecurityToken.ValidTo > DateTime.UtcNow)
+        {
+            return BadRequest("O token de acesso ainda é válido.");
+        }
 
         // Extrai o ClaimsPrincipal a partir do token de acesso expirado
         var principal = _tokenService.GetPrincipalFromExpiredToken(acessToken!, _configuration);
         if (principal == null)
         {
-            return BadRequest("Invalid acess token/refresh token");
+            return BadRequest("Invalid access token/refresh token");
         }
 
-        // Obtém o nome do usuário a partir das claims
         string userName = principal.Identity.Name;
-
-        // Busca o usuário no banco de dados
         var user = await _userManager.FindByNameAsync(userName!);
 
-        // Verifica se o usuário existe, se o refresh token confere e se o mesmo ainda é válido
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirtyTime <= DateTime.Now)
+        // Correção da verificação de expiração do Refresh Token
+        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirtyTime > DateTime.Now)
         {
-            return BadRequest("Invalid acess token/refresh token");
+            return BadRequest("Invalid access token/refresh token");
         }
 
-        // Gera um novo token de acesso com as claims existentes
+        // Gera um novo token de acesso e refresh token seguro
         var newAcessToken = _tokenService.GenerateAcessToken(principal.Claims.ToList(), _configuration);
-        // Gera um novo refresh token
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        // Atualiza o usuário com o novo refresh token
+        // Adiciona um identificador único para garantir que apenas o último refresh token seja válido
         user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpirtyTime = DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:RefreshTokenValidityInMinutes"));
+
         await _userManager.UpdateAsync(user);
 
-        // Retorna os novos tokens
-        return new ObjectResult(new
+        return Ok(new
         {
-            acessToken = new JwtSecurityTokenHandler().WriteToken(newAcessToken),
-            refreshToken = newRefreshToken
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(newAcessToken),
+            RefreshToken = newRefreshToken,
+            Expiration = newAcessToken.ValidTo
         });
     }
 

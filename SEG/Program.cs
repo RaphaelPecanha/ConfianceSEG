@@ -59,7 +59,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
 
 builder.Services.AddScoped<ApiLoggingFilter>();
-// Repositórios / Classes
+// Repositï¿½rios / Classes
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUsuariosRepository, UsuarioRepository>();
@@ -78,7 +78,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Em produção colocar essa opção como true
+    options.RequireHttpsMetadata = false; // Em produï¿½ï¿½o colocar essa opï¿½ï¿½o como true
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,

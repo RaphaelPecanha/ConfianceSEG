@@ -10,7 +10,7 @@ public class Usuario
 {
     [Key]
     [Column("id_user")]
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     [Required(ErrorMessage = "Nome de usuário obrigatório")]
     [Column("nome", TypeName = "VARCHAR(45)")]
@@ -30,7 +30,7 @@ public class Usuario
 
     [Required(ErrorMessage = "IdSetor de usuário obrigatório")]
     [Column("id_set", TypeName = "INT(10)")]
-    public int IdSetor { get; set; }
+    public int? IdSetor { get; set; }
 
     [Required(ErrorMessage = "Data Cadastro de usuário obrigatório")]
     [Column("dtcad_us", TypeName = "TIMESTAMP")]
@@ -48,7 +48,7 @@ public class Usuario
 
     // [JsonIgnore] ignora esse atributo na serialização e não aparece como opção
     [Column("id_sapiens", TypeName = "INT(11)")]
-    public int IdSapiens { get; set; }
+    public int? IdSapiens { get; set; }
 
 
     //Usar pra fazer validações nas propriedades
