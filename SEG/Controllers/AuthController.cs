@@ -249,7 +249,7 @@ public class AuthController : ControllerBase
 
         // Verifica se o token de acesso ainda é válido para evitar renovações desnecessárias
         var handler = new JwtSecurityTokenHandler();
-        ar jwtSecurityToken = handler.ReadJwtToken(acessToken);
+        var jwtSecurityToken = handler.ReadJwtToken(acessToken);
 
         if (jwtSecurityToken.ValidTo > DateTime.UtcNow)
         {

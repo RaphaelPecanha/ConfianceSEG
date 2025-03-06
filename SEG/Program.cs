@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +67,10 @@ builder.Services.AddScoped<IUsuariosRepository, UsuarioRepository>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization( options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+});
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
@@ -90,6 +94,19 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
+});
+
+builder.Services.AddApiVersioning(o => 
+{
+    o.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ReportApiVersions = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
 

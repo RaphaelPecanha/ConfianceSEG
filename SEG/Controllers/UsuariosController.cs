@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SEG.Context;
 using SEG.Filters;
 using SEG.Models;
+using SEG.Models.DTO;
 using SEG.Repositories;
 
 namespace SEG.Controllers
 {
-
-    // Com o action pra acessar os end points pelo nome do método
-    [Route("[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class UsuariosController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
@@ -23,46 +24,37 @@ namespace SEG.Controllers
             _logger = logger;
         }
 
-        // Algumas restrições que podem ser colocado no verbo http para evitar consultas nos bancos desnecessárias
-        // [HttpGet("id:int") -- Apenas numero inteiro
-        // [HttpGet("id:alpha") -- Apenas alpha numeros
-        // [HttpGet("id:bool") -- Apenas booleanos 0 / 1
-        // [HttpGet("id:datetime") -- Apenas valores de DateTime
-        // [HttpGet("id:decimal") -- Apenas numero decimais
-        // Outros a mais que pode ser acrescentados
-        // :length(5) - Tamanho de 5
-        // :maxlength(10) - até 10
-        // : minlength(5) - minimo 5
-
-        [HttpGet] //Usuarios/Get
+        [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Usuario>>> Get()
         {
             var usuarios = await _uow.UsuariosRepository.GetAllAsync();
 
             if (usuarios is null)
-                return NotFound("Usuários não encontrado");
+                return NotFound("Usuários não encontrados");
 
             return Ok(usuarios);
         }
-        [HttpGet("/GetValidarUsuario/{login}/{senha}")]
+
+        [HttpPost("ValidarUsuario")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        /*public async Task<ActionResult<Usuario>> GetValidarUsuario([FromQuery]string login, string senha)*/
-        public async Task<ActionResult<Usuario>> GetValidarUsuario(string login, string senha)
+        public async Task<ActionResult<Usuario>> PostValidarUsuario([FromBody] UsuarioLoginDTO usuarioLogin)
         {
-            _logger.LogInformation($" ======= Acessando GetValidarUsuario: {login}");
+            if (usuarioLogin is null)
+                return BadRequest("Dados inválidos");
 
-            var usuario = await _uow.UsuariosRepository.GetAsync(u => u.Login == login && u.Senha == senha);
+            _logger.LogInformation($" ======= Acessando PostValidarUsuario: {usuarioLogin.Login}");
 
-            if (usuario is null)
-                return NotFound();
+            var usuarioEncontrado = await _uow.UsuariosRepository
+                .GetAsync(u => u.Login == usuarioLogin.Login && u.Senha == usuarioLogin.Senha);
 
-            return Ok(usuario);
-           // return StatusCode(StatusCodes.Status200OK, "Sucesso");
+            if (usuarioEncontrado is null)
+                return NotFound("Usuário não encontrado");
 
+            return Ok(usuarioEncontrado);
         }
-        [HttpGet("/GetById/{id:int:min(1)}")] //GetById/<id>
-        [HttpGet("{id:int:min(1)}", Name = "UsuarioAdd")] //Usuarios/Get/<id>
+
+        [HttpGet("{id:int:min(1)}", Name = "UsuarioAdd")]
         public async Task<ActionResult<Usuario>> Get(int id)
         {
             var usuario = await _uow.UsuariosRepository.GetAsync(u => u.Id == id);
@@ -73,12 +65,21 @@ namespace SEG.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Usuario usuario)
+        //[Authorize(Policy = "Admin")] // Define que o usuário precisa da permissão de Admin pra acessar
+        public async Task<ActionResult> Post([FromBody] UsuarioDTO usuarioDto)
         {
-            if (usuario is null)
+            if (usuarioDto is null)
             {
                 return BadRequest();
             }
+
+            var usuario = new Usuario
+            {
+                Id = usuarioDto.Id,
+                Nome = usuarioDto.Nome,
+                Login = usuarioDto.Login,
+                Senha = usuarioDto.Senha
+            };
 
             _uow.UsuariosRepository.Create(usuario);
             await _uow.CommitAsync();
