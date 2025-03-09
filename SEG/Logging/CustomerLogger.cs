@@ -1,15 +1,28 @@
-﻿
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
+
 namespace SEG.Logging;
 
 public class CustomerLogger : ILogger
 {
     readonly string loggerName;
     readonly CustomLoggerProviderConfiguration loggerConfig;
+    private readonly string logDirectory;
 
-    public CustomerLogger(string loggerName, CustomLoggerProviderConfiguration loggerConfig)
+    public CustomerLogger(string loggerName, CustomLoggerProviderConfiguration loggerConfig, IConfiguration configuration)
     {
-        loggerName = loggerName;
-        loggerConfig = loggerConfig;
+        this.loggerName = loggerName;
+        this.loggerConfig = loggerConfig;
+
+        // Obtém o diretório de logs do appsettings.json
+        logDirectory = configuration.GetValue<string>("Logging:LogDirectory") ?? "C:\\WebAPI\\Logging";
+
+        // Garante que o diretório exista
+        if (!Directory.Exists(logDirectory))
+        {
+            Directory.CreateDirectory(logDirectory);
+        }
     }
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
@@ -30,20 +43,16 @@ public class CustomerLogger : ILogger
 
     private void EscreverTextoNoArquivo(string mensagem)
     {
-        string caminhoArquivoLog =  @$"C:\Users\faelz\Documents\GitHub\SEG\SEG\Logging\log_{DateTime.Now:yyyy-MM-dd}.txt";
+        string caminhoArquivoLog = Path.Combine(logDirectory, $"log_{DateTime.Now:yyyy-MM-dd}.txt");
 
-
-        using (StreamWriter streamWrite = new StreamWriter(caminhoArquivoLog, true)) 
+        try
         {
-            try
-            {
-                streamWrite.WriteLine(mensagem);
-                streamWrite.Close();
-            }
-            catch(Exception)
-            {
-                throw;
-            }
+            using StreamWriter streamWrite = new StreamWriter(caminhoArquivoLog, true);
+            streamWrite.WriteLine(mensagem);
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 }

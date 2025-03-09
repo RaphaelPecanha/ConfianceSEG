@@ -110,10 +110,13 @@ builder.Services.AddApiVersioning(o =>
 });
 
 
-builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
-{
-    LogLevel = LogLevel.Information,
-}));
+builder.Logging.AddProvider(new CustomLoggerProvider(
+    new CustomLoggerProviderConfiguration
+    {
+        LogLevel = LogLevel.Information
+    },
+    builder.Configuration // Passa corretamente o IConfiguration
+));
 
 var app = builder.Build();
 
