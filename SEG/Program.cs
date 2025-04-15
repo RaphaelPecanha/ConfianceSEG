@@ -18,6 +18,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:5173") // sua aplicação React (Vite)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // se você estiver usando autenticação com cookies ou headers
+    });
+});
+
+
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(ApiExceptionFilter));
@@ -129,6 +142,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
+
 app.UseAuthorization();
 app.MapControllers();
 
