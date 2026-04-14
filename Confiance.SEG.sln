@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34607.119
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SEG", "SEG\SEG.csproj", "{61007F24-49F7-4366-9124-760F0821C27E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Confiance.SEG.API", "SEG\Confiance.SEG.API.csproj", "{61007F24-49F7-4366-9124-760F0821C27E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.Infrastructure", "Confiance.SEG.Infrastructure\Confiance.SEG.Infrastructure.csproj", "{9286D183-8223-474E-BD9B-89420BCD4A39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{61007F24-49F7-4366-9124-760F0821C27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61007F24-49F7-4366-9124-760F0821C27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61007F24-49F7-4366-9124-760F0821C27E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9286D183-8223-474E-BD9B-89420BCD4A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9286D183-8223-474E-BD9B-89420BCD4A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9286D183-8223-474E-BD9B-89420BCD4A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9286D183-8223-474E-BD9B-89420BCD4A39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

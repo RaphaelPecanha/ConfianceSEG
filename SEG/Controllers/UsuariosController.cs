@@ -7,6 +7,8 @@ using SEG.Filters;
 using SEG.Models;
 using SEG.Models.DTO;
 using SEG.Repositories;
+// Adicione o using se o MD5HashGenerator estiver em um namespace diferente
+// using SEG.Utils; 
 
 namespace SEG.Controllers
 {
@@ -45,11 +47,16 @@ namespace SEG.Controllers
 
             _logger.LogInformation($" ======= Acessando PostValidarUsuario: {usuarioLogin.Login}");
 
+            // --- MODIFICAÇÃO AQUI: Criptografa a senha para MD5 antes da consulta ---
+            string senhaCriptografada = MD5HashGenerator.GenerateMD5Hash(usuarioLogin.Senha);
+
             var usuarioEncontrado = await _uow.UsuariosRepository
-                .GetAsync(u => u.Login == usuarioLogin.Login && u.Senha == usuarioLogin.Senha);
+                // Usa a senha criptografada na comparação
+                .GetAsync(u => u.Login == usuarioLogin.Login && u.Senha == senhaCriptografada);
+            // ----------------------------------------------------------------------
 
             if (usuarioEncontrado is null)
-                return NotFound("Usuário não encontrado");
+                return NotFound("Usuário não encontrado ou senha incorreta");
 
             return Ok(usuarioEncontrado);
         }
@@ -73,12 +80,17 @@ namespace SEG.Controllers
                 return BadRequest();
             }
 
+            // IMPORTANTE: Se você armazena a senha criptografada em MD5 no banco de dados,
+            // você deve criptografar a senha também neste método 'Post' de criação de usuário.
+            string senhaCriptografada = MD5HashGenerator.GenerateMD5Hash(usuarioDto.Senha);
+
             var usuario = new Usuario
             {
                 Id = usuarioDto.Id,
                 Nome = usuarioDto.Nome,
                 Login = usuarioDto.Login,
-                Senha = usuarioDto.Senha
+                // Armazena a senha criptografada
+                Senha = senhaCriptografada
             };
 
             _uow.UsuariosRepository.Create(usuario);

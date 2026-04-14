@@ -9,7 +9,7 @@ namespace SEG.Models;
 public class Usuario
 {
     [Key]
-    [Column("id_user")]
+    [Column("id_usuario")]
     public int? Id { get; set; }
 
     [Required(ErrorMessage = "Nome de usuário obrigatório")]

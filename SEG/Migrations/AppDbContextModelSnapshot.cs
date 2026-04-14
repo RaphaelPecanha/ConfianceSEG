@@ -17,7 +17,7 @@ namespace SEG.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -226,12 +226,12 @@ namespace SEG.Migrations
 
             modelBuilder.Entity("SEG.Models.Usuario", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id_user");
+                        .HasColumnName("id_usuario");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int?>("Id"));
 
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("TIMESTAMP")
@@ -242,11 +242,12 @@ namespace SEG.Migrations
                         .HasColumnType("VARCHAR(200)")
                         .HasColumnName("email");
 
-                    b.Property<int>("IdSapiens")
+                    b.Property<int?>("IdSapiens")
                         .HasColumnType("INT(11)")
                         .HasColumnName("id_sapiens");
 
-                    b.Property<int>("IdSetor")
+                    b.Property<int?>("IdSetor")
+                        .IsRequired()
                         .HasColumnType("INT(10)")
                         .HasColumnName("id_set");
 
