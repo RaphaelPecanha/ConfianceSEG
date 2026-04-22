@@ -1,6 +1,6 @@
-﻿using SEG.Models;
+using Confiance.SEG.Domain;
 
-namespace SEG.Repositories;
+namespace Confiance.SEG.Infrastructure.Repositories;
 
 public interface IUsuariosRepository : IRepository<Usuario>
 {

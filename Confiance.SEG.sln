@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Confiance.SEG.API", "SEG\Confiance.SEG.API.csproj", "{61007F24-49F7-4366-9124-760F0821C27E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.Infrastructure", "Confiance.SEG.Infrastructure\Confiance.SEG.Infrastructure.csproj", "{9286D183-8223-474E-BD9B-89420BCD4A39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.Domain", "Confiance.SEG.Domain\Confiance.SEG.Domain.csproj", "{DC174694-104D-4CBA-A135-2C3F0CCA128E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.Application", "Confiance.SEG.Application\Confiance.SEG.Application.csproj", "{7F27A526-621E-4CAD-8F35-41FEF55757EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.CrossCutting", "Confiance.SEG.CrossCutting\Confiance.SEG.CrossCutting.csproj", "{D7C0BCB1-FA0F-47D9-8DEF-400CE3DEAE71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confiance.SEG.Infrastructure", "Confiance.SEG.Infrastructure\Confiance.SEG.Infrastructure.csproj", "{AAE6747E-01C6-4CE3-AC99-88D98A3B7FF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +23,22 @@ Global
 		{61007F24-49F7-4366-9124-760F0821C27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61007F24-49F7-4366-9124-760F0821C27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61007F24-49F7-4366-9124-760F0821C27E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9286D183-8223-474E-BD9B-89420BCD4A39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9286D183-8223-474E-BD9B-89420BCD4A39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9286D183-8223-474E-BD9B-89420BCD4A39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9286D183-8223-474E-BD9B-89420BCD4A39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC174694-104D-4CBA-A135-2C3F0CCA128E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC174694-104D-4CBA-A135-2C3F0CCA128E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC174694-104D-4CBA-A135-2C3F0CCA128E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC174694-104D-4CBA-A135-2C3F0CCA128E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F27A526-621E-4CAD-8F35-41FEF55757EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F27A526-621E-4CAD-8F35-41FEF55757EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F27A526-621E-4CAD-8F35-41FEF55757EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F27A526-621E-4CAD-8F35-41FEF55757EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7C0BCB1-FA0F-47D9-8DEF-400CE3DEAE71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C0BCB1-FA0F-47D9-8DEF-400CE3DEAE71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C0BCB1-FA0F-47D9-8DEF-400CE3DEAE71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C0BCB1-FA0F-47D9-8DEF-400CE3DEAE71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAE6747E-01C6-4CE3-AC99-88D98A3B7FF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAE6747E-01C6-4CE3-AC99-88D98A3B7FF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAE6747E-01C6-4CE3-AC99-88D98A3B7FF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAE6747E-01C6-4CE3-AC99-88D98A3B7FF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

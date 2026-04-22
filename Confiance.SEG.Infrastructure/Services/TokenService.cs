@@ -1,52 +1,42 @@
-﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Confiance.SEG.Application.Interfaces;
+using Microsoft.Extensions.Configuration;
 
-namespace SEG.Services;
+namespace Confiance.SEG.Infrastructure.Services;
 
 public class TokenService : ITokenService
 {
-    public JwtSecurityToken GenerateAcessToken(IEnumerable<Claim> claims, IConfiguration _config)
+    public SecurityToken GenerateAcessToken(IEnumerable<Claim> claims, IConfiguration configuration)
     {
-        var key = _config.GetSection("JWT").GetValue<string>("SecretKey") ?? throw new InvalidOperationException("Invalid secret key");
+        var secretKey = configuration["JWT:SecretKey"] ?? throw new ArgumentException("Invalid secret key");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var privateKey = Encoding.UTF8.GetBytes(key);
-
-        var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(privateKey), SecurityAlgorithms.HmacSha256Signature);
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_config.GetSection("JWT").GetValue<double>("TokenValidityInMinutes")),
-            Audience = _config.GetSection("JWT").GetValue<string>("ValidAudiences"),
-            Issuer = _config.GetSection("JWT").GetValue<string>("ValidIssuer"),
-            SigningCredentials = signingCredentials
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+        var token = new JwtSecurityToken(
+            issuer: configuration["JWT:ValidIssuer"],
+            audience: configuration["JWT:ValidAudiences"],
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(int.TryParse(configuration["JWT:TokenValidityInMinutes"], out var v) ? v : 30),
+            signingCredentials: creds
+        );
 
         return token;
     }
 
     public string GenerateRefreshToken()
     {
-        var secureRandomBytes = new byte[128];
-
-        using var randomNumberGenerator = RandomNumberGenerator.Create();
-
-        randomNumberGenerator.GetBytes(secureRandomBytes);
-
-        var refreshToken = Convert.ToBase64String(secureRandomBytes);
-        
-        return refreshToken;
+        var randomNumber = new byte[32];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, IConfiguration _config)
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token, IConfiguration configuration)
     {
-        var secretKey = _config["JWT:SecretKey"] ?? throw new InvalidOperationException("Invalid secret key");
+        var secretKey = configuration["JWT:SecretKey"] ?? throw new ArgumentException("Invalid secret key");
 
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -58,14 +48,19 @@ public class TokenService : ITokenService
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-
-        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        try
         {
-            throw new SecurityTokenException("Invalid token");
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is JwtSecurityToken jwt && jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return principal;
+            }
+        }
+        catch
+        {
+            // ignore and return null
         }
 
-        return principal;
-
+        return null;
     }
 }

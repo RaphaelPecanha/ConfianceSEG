@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SEG.Context;
-using SEG.Extensions;
-using SEG.Filters;
-using SEG.Logging;
+using Confiance.SEG.CrossCutting.Filters;
 using SEG.Models;
-using SEG.Repositories;
-using SEG.Services;
+using Confiance.SEG.Infrastructure.Repositories;
+using Confiance.SEG.Application.Interfaces;
+using SEG.Extensions;
+using SEG.Logging;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -18,17 +18,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", builder =>
-    {
-        builder
-            .WithOrigins("http://localhost:5173") // sua aplicação React (Vite)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // se você estiver usando autenticação com cookies ou headers
-    });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("CorsPolicy", builder =>
+//    {
+//        builder
+//            .WithOrigins("http://localhost:5173") // sua aplicação React (Vite)
+//            .AllowAnyHeader()
+//            .AllowAnyMethod()
+//            .AllowCredentials(); // se você estiver usando autenticação com cookies ou headers
+//    });
+//});
 
 
 builder.Services.AddControllers(options =>
@@ -73,12 +73,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
 
 builder.Services.AddScoped<ApiLoggingFilter>();
-// Reposit�rios / Classes
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUsuariosRepository, UsuarioRepository>();
+// Repositories / Classes (from Infrastructure)
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Confiance.SEG.Infrastructure.Repositories.Repository<>));
+builder.Services.AddScoped<IUnitOfWork, Confiance.SEG.Infrastructure.Repositories.UnitOfWork>();
+builder.Services.AddScoped<IUsuariosRepository, Confiance.SEG.Infrastructure.Repositories.UsuarioRepository>();
 
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITokenService, Confiance.SEG.Infrastructure.Services.TokenService>();
 
 builder.Services.AddAuthorization( options =>
 {
@@ -131,6 +131,15 @@ builder.Logging.AddProvider(new CustomLoggerProvider(
     builder.Configuration // Passa corretamente o IConfiguration
 ));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -142,8 +151,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
+app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

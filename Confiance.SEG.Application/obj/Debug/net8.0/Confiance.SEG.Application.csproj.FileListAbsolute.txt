@@ -1,0 +1,16 @@
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\bin\Debug\net8.0\Confiance.SEG.Application.deps.json
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\bin\Debug\net8.0\Confiance.SEG.Application.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\bin\Debug\net8.0\Confiance.SEG.Application.pdb
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\bin\Debug\net8.0\Confiance.SEG.Domain.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\bin\Debug\net8.0\Confiance.SEG.Domain.pdb
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.csproj.AssemblyReference.cache
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.AssemblyInfoInputs.cache
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.AssemblyInfo.cs
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.csproj.CoreCompileInputs.cache
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.sourcelink.json
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confianc.9907AA76.Up2Date
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\refint\Confiance.SEG.Application.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\Confiance.SEG.Application.pdb
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Application\obj\Debug\net8.0\ref\Confiance.SEG.Application.dll

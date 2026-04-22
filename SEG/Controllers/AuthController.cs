@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SEG.Models;
-using SEG.Services;
+using Confiance.SEG.Application.Interfaces;
+using Confiance.SEG.Application.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace SEG.Controllers;
+namespace Confiance.SEG.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

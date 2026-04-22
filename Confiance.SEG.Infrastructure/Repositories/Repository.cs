@@ -1,47 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SEG.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using SEG.Context;
 
-namespace SEG.Repositories;
+namespace Confiance.SEG.Infrastructure.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
+    protected readonly DbSet<T> _dbSet;
 
     public Repository(AppDbContext context)
     {
         _context = context;
+        _dbSet = context.Set<T>();
     }
 
     public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
     {
-        return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        return await _dbSet.FirstOrDefaultAsync(predicate);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
-        // Usar o AsNoTracking pra não ficar rastreavel assim melhora o desempenho
-        // Porém é bom usar só quando vai ter certeza que não vai reutilizar as informações que trouxe
-        // Aqui no exemplo esta apenas consultando e mostrando as informações
-        // Não preciso usar ela depois
-
-        return await _context.Set<T>().AsNoTracking().ToListAsync();
-    }
-    public T Create(T entity)
-    {
-        _context.Set<T>().Add(entity);
-        return entity;
+        return await _dbSet.ToListAsync();
     }
 
-    public T Delete(T entity)
+    public void Create(T entity)
     {
-        _context.Set<T>().Remove(entity);
-        return entity;
+        _dbSet.Add(entity);
     }
 
-    public T Update(T entity)
+    public void Update(T entity)
     {
-        _context.Set<T>().Update(entity);
-        return entity;
+        _dbSet.Update(entity);
+    }
+
+    public void Delete(T entity)
+    {
+        _dbSet.Remove(entity);
     }
 }

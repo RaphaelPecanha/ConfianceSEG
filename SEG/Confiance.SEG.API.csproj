@@ -37,4 +37,18 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Confiance.SEG.CrossCutting\Confiance.SEG.CrossCutting.csproj" />
+    <ProjectReference Include="..\Confiance.SEG.Application\Confiance.SEG.Application.csproj" />
+    <ProjectReference Include="..\Confiance.SEG.Infrastructure\Confiance.SEG.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Context\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Models\DTO\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

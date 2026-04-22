@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Confiance.SEG.Domain/1.0.0": {
+        "runtime": {
+          "Confiance.SEG.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Confiance.SEG.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

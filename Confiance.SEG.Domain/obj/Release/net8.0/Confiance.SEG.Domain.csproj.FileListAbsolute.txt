@@ -1,0 +1,12 @@
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\bin\Release\net8.0\Confiance.SEG.Domain.deps.json
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\bin\Release\net8.0\Confiance.SEG.Domain.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\bin\Release\net8.0\Confiance.SEG.Domain.pdb
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.AssemblyInfoInputs.cache
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.AssemblyInfo.cs
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.sourcelink.json
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\refint\Confiance.SEG.Domain.dll
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\Confiance.SEG.Domain.pdb
+C:\Users\Raphael\Documents\GitHub\ConfianceSEG\Confiance.SEG.Domain\obj\Release\net8.0\ref\Confiance.SEG.Domain.dll
